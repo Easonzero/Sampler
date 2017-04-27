@@ -1,0 +1,18 @@
+{
+  "name": "sampler",
+  "version": "1.0.0",
+  "description": "a sampler by webgl",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sampler"
+  ],
+  "author": "easonzero",
+  "license": "ISC",
+  "devDependencies": {
+    "rollup": "^0.41.5",
+    "rollup-watch": "^3.2.2"
+  }
+}
