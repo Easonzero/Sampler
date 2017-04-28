@@ -4,7 +4,7 @@
 let canvas = document.getElementById('canvas');
 
 let renderer = new $S.Renderer(canvas);
-let sampler = new $S.Sampler('power',4);
+let sampler = new $S.Sampler('cosineWeightedDirection',$V([0,1,0]));
 let print = false;
 
 function tick(){

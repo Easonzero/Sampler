@@ -526,6 +526,10 @@
 	        }
 	    }
 
+	    addSampler(name,f){
+	        find[name] = f;
+	    }
+
 	    sampling(){
 	        this.sampleNum++;
 	        let result = this.__sampling();
@@ -544,7 +548,7 @@
 	            for(let j=0;j<this.divide;j++){
 	                let start=this.start[i]+j*this.delt[i],
 	                    end=this.start[i]+(j+1)*this.delt[i];
-	                console.log(`${start}-${end}    ${this.events[i][j]}`);
+	                console.log(`${start.toFixed(3)}-${end.toFixed(3)}    ${this.events[i][j]}|${(this.events[i][j]/this.sampleNum*100).toFixed(1)}%`);
 	            }
 	        }
 	    }
