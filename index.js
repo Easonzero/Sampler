@@ -3,11 +3,9 @@
  */
 import * as matrix from './math/math.matrix';
 import {Renderer} from './render/renderer';
-import * as sampler from './sampler/index';
+import {Sampler} from './sampler/sampler.index';
 
-window.Sampler = {
+window.$S = {
     Renderer:Renderer,
-    cosineWeightedDirection:sampler.cosineWeightedDirection,
-    uniformlyRandomDirection:sampler.uniformlyRandomDirection,
-    sa:sampler.sa
+    Sampler:Sampler
 };

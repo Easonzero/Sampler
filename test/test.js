@@ -3,17 +3,21 @@
  */
 let canvas = document.getElementById('canvas');
 
-let renderer = new Sampler.Renderer(canvas);
-
-let data = [];
+let renderer = new $S.Renderer(canvas);
+let sampler = new $S.Sampler('power',4);
+let print = false;
 
 function tick(){
     requestAnimationFrame(tick);
-    renderer.render(data);
-    if(data.length>10000) return;
-    for(let i=0;i<10;i++){
-        data.push(...Sampler.sa().flatten());
+    renderer.render(sampler.sampleDatas);
+    if(sampler.sampleNum>1000){
+        if(!print) {
+            sampler.print();
+            print = !print;
+        }
+        return;
     }
+    sampler.sampling();
 }
 
 tick();

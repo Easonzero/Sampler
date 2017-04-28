@@ -9,10 +9,15 @@ class ShaderProgram {
         this.vertexBuffer = gl.createBuffer();
         this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
         gl.enableVertexAttribArray(this.vertexAttribute);
+        gl.enable(gl.BLEND);
+        gl.disable(gl.DEPTH_TEST);
+        gl.blendFunc(gl.ONE, gl.ONE)
     }
 
     render(flag,vertexs){
         gl.useProgram(this.program);
+
+        WebglHelper.clearScreen();
 
         this._updateUniforms();
         if(vertexs) this._updateVBO(vertexs);
@@ -46,7 +51,7 @@ class ShaderProgram {
 }
 class WebglHelper {
     static clearScreen(){
-        gl.clearColor(0.0,0.0,1.0,1.0);
+        gl.clearColor(0.5,0.5,0.5,1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 

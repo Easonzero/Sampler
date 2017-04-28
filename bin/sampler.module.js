@@ -94,10 +94,15 @@ class ShaderProgram {
         this.vertexBuffer = gl.createBuffer();
         this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
         gl.enableVertexAttribArray(this.vertexAttribute);
+        gl.enable(gl.BLEND);
+        gl.disable(gl.DEPTH_TEST);
+        gl.blendFunc(gl.ONE, gl.ONE);
     }
 
     render(flag,vertexs){
         gl.useProgram(this.program);
+
+        WebglHelper.clearScreen();
 
         this._updateUniforms();
         if(vertexs) this._updateVBO(vertexs);
@@ -131,7 +136,7 @@ class ShaderProgram {
 }
 class WebglHelper {
     static clearScreen(){
-        gl.clearColor(0.0,0.0,1.0,1.0);
+        gl.clearColor(0.5,0.5,0.5,1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
@@ -410,7 +415,7 @@ class Control{
 
 var vs_render = "#version 300 es\nin vec3 vertex;\nuniform mat4 matrix;\nvoid main() {\n    gl_Position = matrix*vec4(vertex,1);\n    gl_PointSize = 2.0;\n}";
 
-var fs_render = "#version 300 es\nprecision highp float;\nout vec4 color;\nvoid main() {\n    color = vec4(1.0,0.1,1.0,0.3);\n}";
+var fs_render = "#version 300 es\nprecision highp float;\nout vec4 color;\nvoid main() {\n    color = vec4(1.0,0.1,1.0,0.2);\n}";
 
 /**
  * Created by eason on 17-4-26.
@@ -444,43 +449,105 @@ class Renderer{
 }
 
 /**
+ * Created by eason on 17-4-27.
+ */
+let find = {
+    cosineWeightedDirection: (normal)=>{
+        return {
+            f: () => {
+                let u = Math.random();
+                let v = Math.random();
+                let angle = 2 * Math.PI * v;
+                let sdir, tdir;
+                if (Math.abs(normal.e(1)) < .5) {
+                    sdir = normal.cross($V([1, 0, 0]));
+                } else {
+                    sdir = normal.cross($V([0, 1, 0]));
+                }
+                tdir = normal.cross(sdir);
+                return {
+                    data: sdir.x(u * Math.cos(angle)).add(tdir.x(u * Math.sin(angle))).add(normal.x(Math.cos(Math.asin(u)))),
+                    x: [Math.asin(u), 2 * Math.PI * v]
+                }
+            },
+            type: 2,
+            range: [[0, Math.PI / 2], [0, 2 * Math.PI]]
+        }
+    },
+
+    power:(n)=>{
+        return {
+            f: () => {
+                let sample = [];
+                for(let i=0;i<n+1;i++){
+                    sample.push(Math.random());
+                }
+                let max = Math.max(...sample);
+                return {
+                    data: $V([max, 0, 0]),
+                    x: [max]
+                };
+            },
+            type: 1,
+            range: [[0, 1]]
+        }
+    }
+};
+
+/**
  * Created by eason on 17-4-26.
  */
+class Sampler{
+    constructor(name,...attr){
+        let temp = find[name](...attr);
+        this.__sampling = temp.f;
+        this.type = temp.type;
 
-function cosineWeightedDirection(normal) {
-    let u = Math.random();
-    let v = Math.random();
-    let r = Math.sqrt(u);
-    let angle = 2*Math.PI*v;
-    let sdir, tdir;
-    if (Math.abs(normal.e(1)) < .5) {
-        sdir = normal.cross($V([1, 0, 0]));
-    } else {
-        sdir = normal.cross($V([0, 1, 0]));
+        this.sampleNum = 0;
+        this.divide = 10;
+        this.start = [];this.delt=[];this.sampleDatas = [];this.events = [];
+
+        for(let i=0;i<this.type;i++){
+            this.start[i] = temp.range[i][0];
+            this.delt[i] = (temp.range[i][1]-temp.range[i][0])/this.divide;
+        }
+
+        for(let i=0;i<this.type;i++){
+            this.events[i] = [];
+            for(let j=0;j<this.divide;j++){
+                this.events[i][j] = 0;
+            }
+        }
     }
-    tdir = normal.cross(sdir);
-    return sdir.x(r * Math.cos(angle)).add(tdir.x(r * Math.sin(angle))).add(normal.x(Math.sqrt(1-u)));
-}
 
-function uniformlyRandomDirection(){
-    let u = Math.random();
-    let v = Math.random();
-    let z = 1.0 - 2.0 * u;   let r = Math.sqrt( 1.0 - z * z );
-    let angle = 2*Math.PI*v;
-    return $V([r * Math.cos(angle),r * Math.sin(angle),z]);
-}
+    sampling(){
+        this.sampleNum++;
+        let result = this.__sampling();
+        this.sampleDatas.push(...result.data.flatten());
 
-function sa(){
-    let x = Math.random()*20-10;
-    return $V([x,Math.sin(x)/x,0]);
+        for(let i=0;i<this.type;i++){
+            let index = (result.x[i]-this.start[i])/this.delt[i];
+            this.events[i][Math.floor(index)]++;
+        }
+    }
+
+    print(){
+        console.log(this.sampleNum);
+        for(let i=0;i<this.type;i++){
+            console.log(`attr${i+1}=>`);
+            for(let j=0;j<this.divide;j++){
+                let start=this.start[i]+j*this.delt[i],
+                    end=this.start[i]+(j+1)*this.delt[i];
+                console.log(`${start}-${end}    ${this.events[i][j]}`);
+            }
+        }
+    }
 }
 
 /**
  * Created by eason on 17-4-26.
  */
-window.Sampler = {
+window.$S = {
     Renderer:Renderer,
-    cosineWeightedDirection:cosineWeightedDirection,
-    uniformlyRandomDirection:uniformlyRandomDirection,
-    sa:sa
+    Sampler:Sampler
 };
