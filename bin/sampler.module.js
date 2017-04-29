@@ -96,7 +96,8 @@ class ShaderProgram {
         gl.enableVertexAttribArray(this.vertexAttribute);
         gl.enable(gl.BLEND);
         gl.disable(gl.DEPTH_TEST);
-        gl.blendFunc(gl.ONE, gl.ONE);
+        gl.blendEquation(gl.FUNC_ADD);
+        gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA,gl.SRC_ALPHA);
     }
 
     render(flag,vertexs){
@@ -136,7 +137,7 @@ class ShaderProgram {
 }
 class WebglHelper {
     static clearScreen(){
-        gl.clearColor(0.5,0.5,0.5,1.0);
+        gl.clearColor(0.9,0.9,0.9,1);
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
@@ -413,9 +414,9 @@ class Control{
     }
 }
 
-var vs_render = "#version 300 es\nin vec3 vertex;\nuniform mat4 matrix;\nvoid main() {\n    gl_Position = matrix*vec4(vertex,1);\n    gl_PointSize = 2.0;\n}";
+var vs_render = "#version 300 es\nin vec3 vertex;\nuniform mat4 matrix;\nuniform float pSize;\nvoid main() {\n    gl_Position = matrix*vec4(vertex,1);\n    gl_PointSize = pSize;\n}";
 
-var fs_render = "#version 300 es\nprecision highp float;\nout vec4 color;\nvoid main() {\n    color = vec4(1.0,0.1,1.0,0.2);\n}";
+var fs_render = "#version 300 es\nprecision highp float;\nout vec4 color;\nvoid main() {\n    color = vec4(1.0,0.0,0.0,0.9);\n}";
 
 /**
  * Created by eason on 17-4-26.
@@ -425,7 +426,7 @@ var fs_render = "#version 300 es\nprecision highp float;\nout vec4 color;\nvoid 
  * Created by eason on 17-4-26.
  */
 class Renderer{
-    constructor(canvas){
+    constructor(canvas,psize=5){
         WebglHelper.initWebgl(canvas);
         this.shader = new ShaderProgram(vs_render,fs_render);
         this.camera = new Camera([0,0,7],[0,0,0]);
@@ -435,6 +436,7 @@ class Renderer{
         this.control.onmousewheel(()=>{ this.update(); });
 
         this.shader.uniforms.matrix = this.camera.projection.x(this.camera.modelview);
+        this.shader.uniforms.pSize = ['float',psize];
     }
 
     update(){

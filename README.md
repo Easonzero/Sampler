@@ -1,7 +1,7 @@
 # Sampler
 just a sampler
 
-Sampler是一个取样调试工具,可以通过图形化取样结果，并计算出各个分布区间的取样个数和取样概率
+Sampler是一个取样调试工具,可以图形化取样结果，并计算出各个分布区间的取样个数和取样概率
 
 ![result](./img/result.png)
 
@@ -79,8 +79,8 @@ Renderer 渲染器
     </tr>
     <tr>
         <td>constructor</td>
-        <td>(canvas)</td>
-        <td>结构体<br>@canvas 画布元素</td>
+        <td>(canvas,pSize=5)</td>
+        <td>结构体<br>@canvas 画布元素<br>@pSize 取样点大小</td>
     </tr>
     <tr>
         <td>render</td>

@@ -11,7 +11,8 @@ class ShaderProgram {
         gl.enableVertexAttribArray(this.vertexAttribute);
         gl.enable(gl.BLEND);
         gl.disable(gl.DEPTH_TEST);
-        gl.blendFunc(gl.ONE, gl.ONE)
+        gl.blendEquation(gl.FUNC_ADD);
+        gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA,gl.SRC_ALPHA);
     }
 
     render(flag,vertexs){
@@ -51,7 +52,7 @@ class ShaderProgram {
 }
 class WebglHelper {
     static clearScreen(){
-        gl.clearColor(0.5,0.5,0.5,1.0);
+        gl.clearColor(0.9,0.9,0.9,1);
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 

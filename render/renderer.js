@@ -7,7 +7,7 @@ import {Control} from './control';
 import {vs_render,fs_render} from './shader/shader.program';
 
 class Renderer{
-    constructor(canvas){
+    constructor(canvas,psize=5){
         WebglHelper.initWebgl(canvas);
         this.shader = new ShaderProgram(vs_render,fs_render);
         this.camera = new Camera([0,0,7],[0,0,0]);
@@ -17,6 +17,7 @@ class Renderer{
         this.control.onmousewheel(()=>{ this.update() });
 
         this.shader.uniforms.matrix = this.camera.projection.x(this.camera.modelview);
+        this.shader.uniforms.pSize = ['float',psize];
     }
 
     update(){
